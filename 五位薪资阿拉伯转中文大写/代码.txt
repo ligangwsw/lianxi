@@ -1,0 +1,52 @@
+#include<stdio.h>
+#include<string.h>
+int main()
+{
+	while(1)
+	{
+	int i;
+	char danwei[]={"万千百十"};
+	char (*p)[3];
+	char b[19],c[5][3],d[3];
+	int a[5];
+	long num;
+	p=c;
+	printf("请输入数字，不大于五位:\n");
+	scanf("%d",&num);
+	a[0]=num/10000;                                      //万
+	a[1]=(num-a[0]*10000)/1000;                          //千
+	a[2]=(num-a[0]*10000-a[1]*1000)/100;                 //百
+	a[3]=(num-a[0]*10000-a[1]*1000-a[2]*100)/10;         //十
+	a[4]=(num-a[0]*10000-a[1]*1000-a[2]*100-a[3]*10);    //个
+	for(i=0;i<5;i++)
+	{
+		switch(a[i])
+		{
+		case 0:strncpy(d,"零",2);break;
+		case 1:strncpy(d,"壹",2);break;
+		case 2:strncpy(d,"贰",2);break;
+		case 3:strncpy(d,"叁",2);break;
+		case 4:strncpy(d,"肆",2);break;
+		case 5:strncpy(d,"伍",2);break;
+		case 6:strncpy(d,"陆",2);break;
+		case 7:strncpy(d,"柒",2);break;
+		case 8:strncpy(d,"捌",2);break;
+		case 9:strncpy(d,"玖",2);break;
+		default:printf("error!!\n");
+		}
+		strncpy(*p++,d,2);
+	}
+	b[0]=c[0][0];b[1]=c[0][1];
+	b[2]=danwei[0];b[3]=danwei[1];
+	b[4]=c[1][0];b[5]=c[1][1];
+	b[6]=danwei[2];b[7]=danwei[3];
+	b[8]=c[2][0];b[9]=c[2][1];
+	b[10]=danwei[4];b[11]=danwei[5];
+	b[12]=c[3][0];b[13]=c[3][1];
+	b[14]=danwei[6];b[15]=danwei[7];
+	b[16]=c[4][0];b[17]=c[4][1];
+	b[18]='\0';
+	puts(b);
+	}
+	return 0;
+}
