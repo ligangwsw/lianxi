@@ -1,0 +1,376 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+typedef struct             //通讯录结点类型
+{
+	char num[5];        //编号
+    char name[9];        //姓名
+    char sex[3];        //性别
+    char company[31];  //公司 
+    char part[9];       //分类 
+    char phone[13];        //电话
+    char addr[31];        //地址
+    char email[31];        //邮箱 
+} DataType;
+
+typedef struct node     //结点类型定义
+{
+    DataType data;        //结点数据域
+    struct node * next;    //结点指针域
+} ListNode;
+
+typedef ListNode * LinkList;
+LinkList head;
+ListNode *p;
+DataType a[50];       //最多可查找显示50个相同条件的人员
+int j;     //记录查到的相同条件的人的个数
+
+//函数说明
+int menu_select();
+LinkList CreateList();
+void InsertNode(LinkList head,ListNode *p);
+ListNode *ListFind(LinkList head);
+void DelNode(LinkList head);
+void PrintList(LinkList head);
+void ChangeNode(LinkList head);
+LinkList createlink(); 
+void outlink(LinkList head);
+//主函数
+int main()
+{	int n;
+    for(;;)
+    {	 
+        switch(menu_select())
+        {
+        case 1:
+            printf("****************************************\n");
+            printf("*            建立通信录          *\n");
+            printf("            1.手动建立\n");
+   			printf("            2.文件导入\n");
+            printf("****************************************\n");
+			printf("请选择建立方式：\n");
+			scanf("%d",&n);	
+			if(n==1) 
+            head=CreateList();
+            else if(n==2) 
+			{
+            head=createlink();
+			} 
+            break;
+        case 2:
+            printf("****************************************\n");
+            printf("*            添加联系人          *\n");
+            printf("****************************************\n");
+            printf("*编号(5)  姓名(8)  性别  公司(31)  分类(9)  电话(11)  地址(31)  邮箱(31)*\n");
+            printf("****************************************\n");
+            p=(ListNode *)malloc(sizeof(ListNode));    //申请新结点
+            scanf("%s%s%s%s%s%s%s%s",p->data.num,p->data.name,p->data.sex,p->data.company,p->data.part,p->data.phone,p->data.addr,p->data.email);
+            InsertNode(head,p);
+            break;
+        case 3:
+            printf("****************************************\n");
+            printf("*            查询联系人          *\n");
+            printf("****************************************\n");
+			p=ListFind(head);
+            if(j!=0)
+            {
+                printf("*编号  姓 名  性 别  公司  分类  电话  地 址  邮箱*\n");
+                printf("----------------------------------------\n");
+				for(n=0;n<j;n++)
+                printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",a[n].num,a[n].name,a[n].sex,a[n].company,a[n].part,a[n].phone,a[n].addr,a[n].email);
+                printf("----------------------------------------\n");
+            }
+            else
+                printf("未找到联系人！\n");
+            break;
+        case 4:
+			printf("****************************************\n");
+            printf("*            修改联系人          *\n");
+            printf("****************************************\n");
+			ChangeNode(head);   //修改 
+			break; 
+        case 5:
+            printf("****************************************\n");
+            printf("*            删除联系人          *\n");
+            printf("****************************************\n");
+            DelNode(head);    //删除结点
+            break;
+        case 6:
+            printf("****************************************\n");
+            printf("*            显示联系人          *\n");
+            printf("****************************************\n");
+            PrintList(head);
+            break;
+        case 0:
+            printf("\t good bye！！！！！！！ \n");
+            outlink(head);
+            return 0;
+        }
+    }
+}
+
+/**********************************/
+/*       菜单选择函数程序         */
+/**********************************/
+int menu_select()
+{
+    int sn;
+    printf("==============================\n");
+    printf("   通讯录管理系统\n");
+    printf("==============================\n");
+    printf("   1.建立通信录\n");
+    printf("   2.添加联系人\n");
+    printf("   3.查询联系人\n");
+    printf("   4.修改联系人\n");
+    printf("   5.删除联系人\n");
+    printf("   6.显示联系人\n");
+    printf("   0.保存并退出管理系统\n");
+    printf("==============================\n");
+    for(;;)
+    {
+        scanf(" %d",&sn);
+        if(sn<0||sn>6)
+            printf("\n\t输入错误，重选0-6");
+        else
+            break;
+    }
+    return sn;
+}
+
+/***********************************/
+/*  用尾插法建立通讯录链表函数     */
+/***********************************/
+LinkList CreateList()
+{
+    //尾插法建立带头结点的通讯录链表算法
+    LinkList head=(ListNode*)malloc(sizeof(ListNode)); //申请表头结点
+    ListNode *p,*rear;
+    int flag=0;        //结束标志置0
+    rear=head;         //尾指针初始指向头结点
+    while(flag==0)
+    {
+        p=(ListNode*)malloc(sizeof(ListNode));    //申请新结点
+        printf("编号(5)  姓名(8)  性别  公司(31)  分类(9)  电话(11)  地址(31)  邮箱(31)\n");
+        printf("-----------------------------------------\n");
+        scanf("%s%s%s%s%s%s%s%s",p->data.num,p->data.name,p->data.sex,p->data.company,p->data.part,p->data.phone,p->data.addr,p->data.email);
+        rear->next=p;            //新结点连接到尾结点之后
+        rear=p;                    //尾指针指向新结点
+        printf("结束建表吗？ (1结束/0继续):");
+        scanf("%d",&flag);        //读入一个标志数据
+    }
+    rear->next=NULL;            //终端结点指针域置空
+    return head;
+}
+
+/*****************************************/
+/*   		添加联系人    */
+/*****************************************/
+void InsertNode(LinkList head,ListNode *p)
+{
+    ListNode *p1,*p2;
+    p1=head;
+    p2=p1->next;
+    while(p2!=NULL && strcmp(p2->data.num,p->data.num)<0)
+    {
+        p1=p2;               //p1指向刚访问过的结点
+        p2=p2->next;         //p2指向表的下一个结点
+    }
+    p1->next=p;               //插入p所指向的结点
+    p->next=p2;               //连接表中剩余部分
+}
+
+/*****************************************/
+/*        查找联系人         */
+/*****************************************/
+ListNode * ListFind(LinkList head)
+{
+    //有序通讯录链表上的查找
+    ListNode *p; 
+    char part[31];
+    char name[9];
+    char company[31]; 
+    int xz;
+	j=0;
+    printf("=================\n");
+    printf("  1.按分类查询   \n");
+    printf("  2.按姓名查询   \n");
+    printf("  3.按公司查询   \n");
+    printf("=================\n");
+    printf("请选择:");
+    p=head->next;    //假定通讯录表带关结点
+    scanf("%d",&xz);
+    fflush(stdin);
+    if(xz==1)
+    {
+        printf("请输入要查找的分类：");
+        scanf("%s",part);
+        fflush(stdin);
+		while(p!=NULL)
+		{
+        while(p&&strcmp(p->data.part,part)!=0)
+            p=p->next;
+		strcpy(a[j].num,p->data.num);strcpy(a[j].name,p->data.name);strcpy(a[j].company,p->data.company);strcpy(a[j].part,p->data.part);strcpy(a[j].phone,p->data.phone);
+		strcpy(a[j].sex,p->data.sex);strcpy(a[j].email,p->data.email);strcpy(a[j].addr,p->data.addr);
+		p=p->next;j++;
+		}
+    }
+    else if(xz==2)
+    {
+        printf("请输入要查找的姓名：");
+        scanf("%s",name);
+        fflush(stdin);
+        while(p!=NULL)
+		{
+        while(p&&strcmp(p->data.name,name)!=0)
+            p=p->next;
+		strcpy(a[j].num,p->data.num);strcpy(a[j].name,p->data.name);strcpy(a[j].company,p->data.company);strcpy(a[j].part,p->data.part);strcpy(a[j].phone,p->data.phone);
+		strcpy(a[j].sex,p->data.sex);strcpy(a[j].email,p->data.email);strcpy(a[j].addr,p->data.addr);
+		p=p->next;j++;
+		}
+    }
+    else if(xz==3)
+    {
+        printf("请输入要查找的公司：");
+        scanf("%s",company);
+        fflush(stdin);
+        while(p!=NULL)
+		{
+        while(p&&strcmp(p->data.company,company)!=0)
+            p=p->next;
+		strcpy(a[j].num,p->data.num);strcpy(a[j].name,p->data.name);strcpy(a[j].company,p->data.company);strcpy(a[j].part,p->data.part);strcpy(a[j].phone,p->data.phone);
+		strcpy(a[j].sex,p->data.sex);strcpy(a[j].email,p->data.email);strcpy(a[j].addr,p->data.addr);
+		p=p->next;j++;
+		}
+	}
+} 
+/*****************************************/
+/*        修改联系人         */
+/*****************************************/
+void ChangeNode(LinkList head)
+{
+	ListNode *p=head; 
+    char num[5];        //编号
+    char name[9];        //姓名
+    char sex[3];        //性别
+    char company[31];  //公司 
+    char part[9];       //分类 
+    char phone[13];        //电话
+    char addr[31];        //地址
+    char email[31];      //邮箱
+    printf("请输入要修改的人员姓名：\n");
+	scanf("%s",name);
+        fflush(stdin);
+        while(p&&strcmp(p->data.name,name)!=0)
+        {
+            p=p->next;
+        }
+	printf("请输入新的内容：\n");	 
+    scanf("%s%s%s%s%s%s%s%s",p->data.num,p->data.name,p->data.sex,p->data.company,p->data.part,p->data.phone,p->data.addr,p->data.email);
+    printf("修改成功！！！\n");
+} 
+/*****************************************/
+/*        删除联系人         */
+/*****************************************/
+void DelNode(LinkList head)
+{
+    char jx;
+    char name[9];
+    ListNode *p,*q;
+    p=head->next;
+    printf("请输入要查找的姓名：");
+    scanf("%s",name);
+    fflush(stdin);
+    while(p&&strcmp(p->data.name,name)!=0)
+            p=p->next;
+    if(p==NULL)
+    {
+        printf("没有查到要删除联系人");
+        return;
+    }
+    printf("真的要删除该联系人吗?(y/n):");
+    scanf("%c",&jx);    //注意在%c前加上一空格可以处理掉输入缓冲区
+    fflush(stdin);        //用这个函数也可以清除输入缓冲区
+    if(jx=='y'||jx=='Y')
+    {
+        q=head;
+        while(q!=NULL && q->next!=p)
+            q=q->next;
+        q->next=p->next;    //删除结点
+        free(p);            //释放被删除的结点空间
+        printf("联系人已被删除\n");
+    }
+}
+
+/*****************************************/
+/*        输出联系人         */
+/*****************************************/
+void PrintList(LinkList head)
+{
+    ListNode *p;
+    p=head->next;            //因为链表带头结点，使p指向链表开始结点
+    printf("编号  姓 名  性 别  公司  分类  电话  地 址  邮箱\n");
+    printf("------------------------------------------\n");
+    while(p!=NULL)
+    {
+        printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",p->data.num,p->data.name,p->data.sex,p->data.company,p->data.part,p->data.phone,p->data.addr,p->data.email);
+        printf("------------------------------------------\n");
+        p=p->next;            //后移一个结点
+    }
+}
+
+
+//从文件中读取数据存入链表?
+LinkList createlink()
+{
+	FILE *r=fopen("shixun.txt","r");
+	LinkList head1=(LinkList)malloc(sizeof(ListNode));
+	char num[5];        //编号
+    char name[9];        //姓名
+    char sex[3];        //性别
+    char company[31];  //公司 
+    char part[9];       //分类 
+    char phone[13];        //电话
+    char addr[31];        //地址
+    char email[31];        //邮箱 
+LinkList p;
+LinkList q;    
+p=q=head1;
+if(r==NULL)
+{
+printf("打开文件失败!");
+return NULL;
+}
+while(fscanf(r,"%s %s %s %s %s %s %s %s",&num,&name,&sex,&company,&part,&phone,&addr,&email)!=EOF)
+{
+q=(LinkList)malloc(sizeof(ListNode));
+strcpy(q->data.num,num);strcpy(q->data.name,name);strcpy(q->data.sex,sex);strcpy(q->data.company,company);
+strcpy(q->data.part,part);strcpy(q->data.phone,phone);strcpy(q->data.addr,addr);strcpy(q->data.email,email);
+p->next=q;
+p=q;
+}
+p->next=NULL;
+fclose(r);
+return(head1);
+}
+//输出链表到文件shixun.txt?
+void outlink(LinkList head)
+{
+LinkList p=head->next;
+FILE *w=fopen("shixun.txt","w");
+if(w==NULL)
+{
+printf("打开文件失败!");
+return;
+}
+while(p)
+{
+//输出链表节点数据到文件shixun.txt?
+fprintf(w,"%s %s %s %s %s %s %s %s ",p->data.num,p->data.name,p->data.sex,p->data.company,
+		p->data.part,p->data.phone,p->data.addr,p->data.email);
+p=p->next;
+}
+printf("\n");
+fprintf(w,"\n");
+fclose(w);
+return;
+}
