@@ -1,0 +1,184 @@
+	#include<stdio.h>
+	#include<string.h>
+	#include<stdlib.h>
+	#define SIZE sizeof(struct student)
+ 
+ 
+   struct student *head;
+   struct student
+   {
+       char num[20];
+      char name[9];
+      char sex[3];
+      char phone[12];
+      char email[30];
+      struct student * next;
+  };
+  
+  
+void candan()
+  {
+      printf("----choose num for your need----\n");
+      printf("-----------no.1 for add---------\n");
+      printf("-----------no.2 for del---------\n");
+      printf("-----------no.3 for find--------\n");
+      printf("-----------no.4 for change------\n");
+      printf("-----------no.5 for save--------\n");
+	  printf("-----------no.6 for exit--------\n");
+      printf("--------------------------------\n");
+  }
+int add(struct student *h)
+  {
+      struct student *p1,*p2;
+      p1=p2=h;
+      while(p1->next!=NULL)
+      {
+		  p2=p1->next;
+		  p1=p2;
+      }
+	  p2=(struct student *)malloc(SIZE);
+      printf(" num name sex phone email\n");
+      scanf("%s%s%s%s%s",p2->num,p2->name,p2->sex,p2->phone,p2->email);
+	  p2->next=p1->next;
+      p1->next=p2;
+      return 0;
+  }
+struct student * find(struct student *h)
+  {
+      struct student *p1,*p2;
+      char name[9];
+      printf("please input the name you want to find or change:\n");
+      scanf("%s",name);
+      p1=h->next;
+	  if(p1==NULL)
+		  {
+			  printf("no tongxunlu\n");
+		  }
+	  else
+      {
+		  while(p1!=NULL&&strcmp(name,p1->name)!=0)
+		 {
+		  p2=p1->next;
+		  p1=p2;
+		 }
+		  return p1;
+	  }
+  }
+  void del(struct student *h)
+  {
+	struct student *p1,*p2;
+	char name[9];
+    printf("please input the name you want to del:\n");
+    scanf("%s",name);
+	p1=p2=h->next;
+	if(p1==NULL)
+		  {
+			  printf("no tongxunlu\n");
+		  }
+	if(strcmp(name,p1->name)==0)
+	{
+		h->next=p1->next;
+		free(p1);
+	}
+	else
+    while(p1!=NULL&&strcmp(name,p1->name)!=0)
+	{
+	p2=p1->next;
+	if(strcmp(name,p2->name)==0)
+		{
+			p1->next=p2->next;
+			free(p2);
+			break;
+		}
+	else
+		{
+		p1=p2;
+		}
+	}
+	printf("del success\n");
+  }
+     int main()
+  {
+	  FILE *fp;
+      int N,flag;                        //flag is fscanf fanhuizhi
+      struct student * p,*ps,*pt;     //ps,pt  used for open file
+	  struct student csd;
+	  char num[20];
+      char name[9];
+      char sex[3];
+      char phone[12];
+      char email[30];
+      struct student * next;
+	  if((fp=fopen("linuxtxl","r"))==NULL)
+		  {
+			  printf("open file error\n");
+		  }
+	  else printf("open file success,loading huancun\n");
+	  head=(struct student *)malloc(SIZE);
+	  head->next=NULL;
+	  ps=head;
+	  
+	  while(fscanf(fp,"%s %s %s %s %s",&num,&name,&sex,&phone,&email)!=EOF)
+	  {
+	  pt=(struct student *)malloc(SIZE);
+	  strcpy(pt->num,num);strcpy(pt->name,name);strcpy(pt->sex,sex);
+				strcpy(pt->phone,phone);strcpy(pt->email,email);
+	  ps->next=pt;
+	  ps=pt;
+	  }
+	  ps->next=NULL;
+	  fclose(fp);
+      while(1)
+      {
+  
+  
+      candan();
+      scanf("%d",&N);
+      if(N==1)
+      {
+          add(head);
+          printf("add success!!\n");
+      }
+	  if(N==2)
+	  {
+		  del(head);
+	  }
+      if(N==3)
+      {
+      p=find(head);
+	  if(p==NULL)printf("NO people you want to find\n");else printf("%s %s %s %s %s\n",p->num,p->name,p->sex,p->phone,p->email);
+      }
+	  if(N==4)
+	  {
+		p=find(head);
+		printf("change information:\n");
+		scanf("%s%s%s%s%s",csd.num,csd.name,csd.sex,csd.phone,csd.email);
+		strcpy(p->num,csd.num);strcpy(p->name,csd.name);strcpy(p->sex,csd.sex);strcpy(p->phone,csd.phone);
+														strcpy(p->email,csd.email);
+		printf("change success\n");
+	  }
+		if(N==5)
+		{	
+			if((fp=fopen("linuxtxl","w"))==NULL)printf("opem error\n");
+			flag=0;
+			ps=head->next;
+			while(ps)
+			{	
+			
+			fprintf(fp,"%s %s %s %s %s\n",ps->num,ps->name,
+									ps->sex,ps->phone,ps->email);
+			ps=ps->next;
+			}
+			fclose(fp);
+			printf("open file to save success\n");
+			
+		}
+		if(N==6)
+		{
+			exit(0);
+		}
+  
+      }
+  return 0;
+  
+  }
