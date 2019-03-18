@@ -1,0 +1,25 @@
+open函数新建文件，错误与否都给出提示信息。
+使用write函数写入信息。
+显示文件大小。定位至头，输入十个字节。
+
+
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<unistd.h>
+int main()
+{
+int fd,size;
+char wenben[]="hello world";
+char xieru[50];
+if((fd=open("/home/lilili/hello.txt",O_RDWR|O_CREAT|O_TRUNC,0764))==-1)
+printf("chuangjianshibai\n");
+else
+size=write(fd,wenben,sizeof(wenben));
+lseek(fd,0,SEEK_SET);
+read(fd,xieru,size);
+close(fd);
+printf("%s\n",xieru);
+return 0;
+}
+

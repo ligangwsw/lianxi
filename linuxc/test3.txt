@@ -1,0 +1,59 @@
+编写简单程序，新建目录罗列所有文件名字和节点编号，统计文件数量。
+
+
+
+#include<sys/types.h>
+  2 #include<sys/stat.h>
+  3 #include<unistd.h>
+  4 #include<limits.h>
+  5 #include<dirent.h>
+  6 int main(int argc,char*argv[])
+  7 {
+  8     struct dirent *B;
+  9     DIR*dp;
+ 10     int n=0;
+ 11     char path[1000];
+ 12     if(argc!=2)
+ 13     {
+ 14         printf("Usage ex3_8<pathname>\n");
+ 15         return 1;
+ 16     }
+ 17     getwd(path);         //dang qian mu lu
+ 18     printf("current directory is %s\n",path);   //shu chu dang qian mu lu
+ 19     if(mkdir(argv[1],S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH)<0)
+ 20     {
+ 21         printf("mkdir filed and goto %s\n",argv[1]);
+ 23         chdir(argv[1]);
+ 24         getwd(path);
+ 25         dp=opendir(path);
+ 26         while((B=readdir(dp))!=0)
+ 27         {
+ 28         printf("%ld   %s\n",B->d_ino,B->d_name);
+ 29         n++;
+ 30         close(dp);
+ 31         }
+	printf("file sum %d\n",n);
+ 	return 0;
+
+ 23     }
+ 24     if(chdir(argv[1])<0)
+ 25     {
+ 26     printf("chdir filed\n");
+ 27     return 3;
+ 28     }
+ 29     getwd(path);
+ 30     if((dp=opendir(path))==NULL)
+ 31     {
+ 32         printf("Opendir error\n");
+ 33         return 4;
+ 34     }
+ 35     while((B=readdir(dp))!=0)
+ 36     {
+ 37     printf("%ld   %s\n",B->d_ino,B->d_name);
+ 38     n++;
+ 39     }
+ 40     close(dp);
+ 41     printf("file sum:  %d\n",n);
+ 42     return 0;
+ 43 }
+
