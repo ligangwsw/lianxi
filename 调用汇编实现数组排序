@@ -1,0 +1,56 @@
+	area init,code,readonly
+	export swap
+swap
+	mov r3,#0
+repeatw
+	mov r2,r0
+	mov r6,r1
+repeatn
+	ldr r4,[r2]
+	ldr r5,[r2,#4]
+	cmp r4,r5
+	bcs change
+	str r4,[r2]
+	str r5,[r2,#4]
+	b label1
+change
+	str r4,[r2,#4]
+	str r5,[r2]
+	b label1
+label1
+	add r2,r2,#4
+	sub r6,r6,#1
+	cmp r6,r3
+	beq label2
+	b repeatn
+label2
+	add r3,r3,#1
+	sub r7,r1,r3
+	cmp r7,#0
+	beq labelend
+	b repeatw
+labelend
+	end
+	//接下来是c
+#include<stdio.h>
+#include<string.h>
+#define SUM 10
+extern void swap(int *p,int sum);
+int main()
+{
+
+	int a[SUM],i;
+	printf("请将%d个数据放至数组当中:\n",SUM);
+	for(i=0;i<SUM;i++)
+	{
+		scanf("%d",&a[i]);
+	}
+	swap(a,SUM-1);
+	printf("经排序，数据如下:\n");
+	for(i=0;i<SUM;i++)
+	{
+		printf("%4d",a[i]);
+	}
+	return 0;
+	
+}
