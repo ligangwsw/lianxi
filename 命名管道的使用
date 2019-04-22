@@ -1,0 +1,195 @@
+//程序存在的错误，在shell中服务器不能正常退出，只能使用CTRL+c，但这样会使得
+下次不能直接使用，必须将管道文件全删掉在重新创建以便，解决方法我觉得可以使用
+更改信号处理函数的方式使SIGINT的信号到来时自动删除创建管道文件。
+
+//服务器
+
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<fcntl.h>
+#include<stdio.h>
+#include<linux/stat.h>
+
+
+int main()
+{
+	FILE *fp;
+	char buffer[101];
+	if((fp=fopen("PBULIC_PIPO","r"))==NULL)
+	{
+		umask(0);
+		mknod("PUBLIC_PIPO",S_IFIFO|0666,0);//public pipo
+	}
+	else
+		fclose(fp);
+	if((fp=fopen("PRIVATE1_PIPO","r"))==NULL)
+        {
+                umask(0);
+                mknod("PRIVATE1_PIPO",S_IFIFO|0666,0); //creat private1
+        } 
+        else
+                fclose(fp);
+	 if((fp=fopen("PRIVATE2_PIPO","r"))==NULL)
+        {
+                umask(0);
+                mknod("PRIVATE2_PIPO",S_IFIFO|0666,0); //creat private1
+        } 
+        else
+                fclose(fp);
+
+
+
+	while(1)
+	{
+		if((fp=fopen("PUBLIC_PIPO","r"))==NULL)
+		{
+		printf("open publicpipo error\n");
+		exit(1);
+		}
+		else if(fgets(buffer,100,fp)!=NULL)
+		{
+		printf("Received string:%s\n",buffer);
+		fclose(fp);
+		}
+		else
+		if(ferror(fp))
+		{
+		printf("read error\n");
+		exit(1);
+		}
+		//   now return information
+		if(buffer[0]=='A')//  A coust
+		{
+			if((fp=fopen("PRIVATE1_PIPO","w"))==NULL)
+			{
+			printf("Open private1 error\n");
+			exit(1);
+			}
+			else
+			{
+			fputs("From server:I have recerved",fp);
+			fclose(fp);
+			}	
+		}
+		else if(buffer[0]=='B')  //B coust
+		{
+			if((fp=fopen("PRIVATE2_PIPO","w"))==NULL)
+                        {
+                        printf("Open private2 error\n");
+                        exit(1);
+                        }
+			else
+			{
+                        fputs("From server:I have recerved",fp);
+                        fclose(fp);
+			}
+		}
+		else
+		{printf("Received not from A or B\n");}
+	}
+	return 0;
+}
+
+// 客户机1
+
+
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<fcntl.h>
+#include<stdio.h>
+#include<linux/stat.h>
+
+
+int main(int argc,char *argv[])
+{
+	char readbuffer[101];
+	FILE *fp;
+if(argc!=2)
+{
+printf("Usage:need something\n");
+return 1;
+}
+if(argv[1][0]!='A')
+{
+printf("ERROR:Begin with A\n");
+return 1;
+}
+	if((fp=fopen("PUBLIC_PIPO","w"))==NULL)
+	{
+		printf("Open publicpipo error\n");
+		exit(1);
+	}
+	else
+	{
+		fputs(argv[1],fp);   //write to public
+		fclose(fp);
+	}
+	if((fp=fopen("PRIVATE1_PIPO","r"))==NULL)
+	{
+		printf("Open private1 error\n");
+		exit(1);
+	}
+	else
+	{
+	fgets(readbuffer,100,fp);
+	printf("%s\n",readbuffer);
+	}
+
+	return 0;
+
+}
+
+//  客户机2
+
+
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<fcntl.h>
+#include<stdio.h>
+#include<linux/stat.h>
+
+
+int main(int argc,char *argv[])
+{
+	char readbuffer[101];
+	FILE *fp;
+if(argc!=2)
+{
+printf("Usage:need something\n");
+return 1;
+}
+if(argv[1][0]!='B')
+{
+printf("ERROR:Begin with B\n");
+return 1;
+}
+	if((fp=fopen("PUBLIC_PIPO","w"))==NULL)
+	{
+		printf("Open publicpipo error\n");
+		exit(1);
+	}
+	else
+	{
+		fputs(argv[1],fp);   //write to public
+		fclose(fp);
+	}
+	if((fp=fopen("PRIVATE2_PIPO","r"))==NULL)
+	{
+		printf("Open private2 error\n");
+		exit(1);
+	}
+	else
+	{
+	fgets(readbuffer,100,fp);
+	printf("%s\n",readbuffer);
+	}
+
+	return 0;
+
+}
