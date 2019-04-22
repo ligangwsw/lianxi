@@ -1,0 +1,39 @@
+//调用进程
+#include<stdio.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<unistd.h>
+#include<string.h>
+int main()
+{
+char a[100];
+int pid;
+printf("input what you want to strupr:\n");
+scanf("%s",a);
+if((pid=fork())==-1)
+        printf("creat pid error\n");
+if(pid==0)
+execl("./zy1_1","./zy1_1",a,NULL);
+else
+execl("./zy1_1","./zy1_1",a,NULL);
+return 0;
+
+}
+//被调用进程
+#include<stdio.h>
+#include<string.h>
+int main(int argc,char *argv[])
+{
+int i;
+char a[100];
+strcpy(a,argv[1]);
+char *p=a;
+for(i=0;i<100;i++)
+{
+if('a'<p[i]&&p[i]<'z')
+        p[i]=p[i]-32;
+}
+printf("change:\n%s  %d\n",a,getpid());
+return 0;
+}

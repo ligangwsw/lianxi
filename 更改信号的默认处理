@@ -1,0 +1,24 @@
+#include<stdio.h>
+#include<signal.h>
+int i=1;
+extern void sigcatcher(int signum);
+int main()
+{
+if(signal(SIGINT,&sigcatcher)==-1)
+	{
+	printf("Couldn't register signal hanlder!\n");
+	exit(1);
+	}
+while(i)
+	{
+	printf("how are you?\n");
+	}
+exit(0);	
+}
+
+void sigcatcher(int signum)
+{
+	i=!i;
+	printf("bye bye!!!\n");
+	exit(0);
+}
