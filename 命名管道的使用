@@ -1,6 +1,7 @@
 //程序存在的错误，在shell中服务器不能正常退出，只能使用CTRL+c，但这样会使得
 下次不能直接使用，必须将管道文件全删掉在重新创建以便，解决方法我觉得可以使用
 更改信号处理函数的方式使SIGINT的信号到来时自动删除创建管道文件。
+//更改：上面的方法可行但没有发现问题所在，真正的问题在创建管道的时候的if判断语句里用到了fopen打开了管道，此时进程已经被阻塞。下面将注释掉。
 
 //服务器
 
@@ -17,27 +18,27 @@ int main()
 {
 	FILE *fp;
 	char buffer[101];
-	if((fp=fopen("PBULIC_PIPO","r"))==NULL)
-	{
+	//if((fp=fopen("PBULIC_PIPO","r"))==NULL)
+	//{
 		umask(0);
 		mknod("PUBLIC_PIPO",S_IFIFO|0666,0);//public pipo
-	}
-	else
-		fclose(fp);
-	if((fp=fopen("PRIVATE1_PIPO","r"))==NULL)
-        {
-                umask(0);
+	//}
+	//else
+	//	fclose(fp);
+	//if((fp=fopen("PRIVATE1_PIPO","r"))==NULL)
+        //{
+        //      umask(0);
                 mknod("PRIVATE1_PIPO",S_IFIFO|0666,0); //creat private1
-        } 
-        else
-                fclose(fp);
-	 if((fp=fopen("PRIVATE2_PIPO","r"))==NULL)
-        {
-                umask(0);
+        //} 
+        //else
+        //        fclose(fp);
+	//if((fp=fopen("PRIVATE2_PIPO","r"))==NULL)
+        //{
+        //        umask(0);
                 mknod("PRIVATE2_PIPO",S_IFIFO|0666,0); //creat private1
-        } 
-        else
-                fclose(fp);
+        //} 
+        //else
+        //        fclose(fp);
 
 
 
